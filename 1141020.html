@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>單字學習遊戲</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+            font-family: 'Microsoft JhengHei', sans-serif;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .bounce {
+            animation: bounce 0.6s ease-in-out;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .letter-card {
+            cursor: grab;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+        .letter-card:hover {
+            transform: scale(1.05);
+        }
+        .letter-card.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+            cursor: grabbing;
+        }
+        .answer-slot {
+            min-width: 40px;
+            min-height: 40px;
+            transition: all 0.2s ease;
+        }
+        .drop-zone {
+            border-color: #3b82f6 !important;
+            background-color: #dbeafe !important;
+        }
+    </style>
+</head>
+<body class="min-h-full bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500">
+    <div class="min-h-full flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-8">
+            
+            <!-- 主選單 -->
+            <div id="mainMenu" class="text-center fade-in">
+                <h1 class="text-4xl font-bold text-gray-800 mb-2">🎯 單字學習遊戲 1141020(一)</h1>
+                <p class="text-gray-600 mb-8">挑戰三個階段，掌握英文單字！</p>
+                
+                <div class="space-y-4">
+                    <button onclick="showGameIntro()" class="w-full bg-gradient-to-r from-green-400 to-blue-500 text-white font-bold py-4 px-8 rounded-xl hover:from-green-500 hover:to-blue-600 transform hover:scale-105 transition-all duration-200 shadow-lg">
+                        🚀 開始遊戲
+                    </button>
+                    
+                    <button onclick="showTeacherLogin()" class="w-full bg-gradient-to-r from-purple-400 to-pink-500 text-white font-bold py-4 px-8 rounded-xl hover:from-purple-500 hover:to-pink-600 transform hover:scale-105 transition-all duration-200 shadow-lg">
+                        👨‍🏫 教師管理區
+                    </button>
+                </div>
+            </div>
+
+            <!-- 教師登入 -->
+            <div id="teacherLogin" class="hidden text-center fade-in">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">🔐 教師登入</h2>
+                <div class="max-w-md mx-auto">
+                    <input type="password" id="teacherPassword" placeholder="請輸入密碼" class="w-full p-4 border-2 border-gray-300 rounded-xl mb-4 text-center text-lg focus:border-blue-500 focus:outline-none">
+                    <div class="space-y-3">
+                        <button onclick="checkTeacherPassword()" class="w-full bg-blue-500 text-white font-bold py-3 px-6 rounded-xl hover:bg-blue-600 transition-colors">
+                            登入
+                        </button>
+                        <button onclick="showMainMenu()" class="w-full bg-gray-500 text-white font-bold py-3 px-6 rounded-xl hover:bg-gray-600 transition-colors">
+                            返回
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 教師管理區 -->
+            <div id="teacherPanel" class="hidden fade-in">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">👨‍🏫 教師管理區</h2>
+                
+                <div class="bg-gray-50 rounded-xl p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-700 mb-4">📚 目前單字庫</h3>
+                    <div class="grid grid-cols-1 gap-3">
+                        <div class="bg-white p-4 rounded-lg border hover:shadow-md transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="font-bold text-blue-600 text-lg">balcony</span> - 陽台
+                                </div>
+                                <button onclick="speakWord('balcony')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm transition-colors flex items-center gap-1">
+                                    🔊 發音
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border hover:shadow-md transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="font-bold text-blue-600 text-lg">band</span> - 樂團
+                                </div>
+                                <button onclick="speakWord('band')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm transition-colors flex items-center gap-1">
+                                    🔊 發音
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border hover:shadow-md transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="font-bold text-blue-600 text-lg">barbecue</span> - 烤肉
+                                </div>
+                                <button onclick="speakWord('barbecue')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm transition-colors flex items-center gap-1">
+                                    🔊 發音
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border hover:shadow-md transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="font-bold text-blue-600 text-lg">bath</span> - 洗澡
+                                </div>
+                                <button onclick="speakWord('bath')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm transition-colors flex items-center gap-1">
+                                    🔊 發音
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border hover:shadow-md transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="font-bold text-blue-600 text-lg">bean</span> - 豆
+                                </div>
+                                <button onclick="speakWord('bean')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm transition-colors flex items-center gap-1">
+                                    🔊 發音
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 rounded-xl p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-700 mb-4">📊 遊戲統計</h3>
+                    <div class="grid grid-cols-3 gap-4 text-center">
+                        <div class="bg-white p-4 rounded-lg">
+                            <div class="text-2xl font-bold text-green-600" id="stage1Stats">0</div>
+                            <div class="text-sm text-gray-600">階段一完成次數</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg">
+                            <div class="text-2xl font-bold text-blue-600" id="stage2Stats">0</div>
+                            <div class="text-sm text-gray-600">階段二完成次數</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg">
+                            <div class="text-2xl font-bold text-purple-600" id="stage3Stats">0</div>
+                            <div class="text-sm text-gray-600">階段三完成次數</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="showMainMenu()" class="w-full bg-gray-500 text-white font-bold py-3 px-6 rounded-xl hover:bg-gray-600 transition-colors">
+                    返回主選單
+                </button>
+            </div>
+
+            <!-- 遊戲說明 -->
+            <div id="gameIntro" class="hidden text-center fade-in">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">🎯 遊戲說明</h2>
+                
+                <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 mb-6">
+                    <div class="space-y-4 text-left">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">1</div>
+                            <div>
+                                <div class="font-bold text-gray-800">階段一：英文選中文</div>
+                                <div class="text-gray-600 text-sm">看英文單字，選擇正確的中文意思（5題）</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">2</div>
+                            <div>
+                                <div class="font-bold text-gray-800">階段二：中文選英文</div>
+                                <div class="text-gray-600 text-sm">看中文意思，選擇正確的英文單字（5題）</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="bg-purple-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">3</div>
+                            <div>
+                                <div class="font-bold text-gray-800">階段三：拼字測驗</div>
+                                <div class="text-gray-600 text-sm">看中文意思，輸入正確的英文拼字（5題）</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
+                    <div class="text-yellow-800 font-bold mb-2">📝 注意事項</div>
+                    <div class="text-yellow-700 text-sm">
+                        • 總共15題，必須依序完成三個階段<br>
+                        • 每題答對得1分，最後會顯示正確率<br>
+                        • 答錯後會顯示正確答案
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <button onclick="startGame()" class="w-full bg-gradient-to-r from-green-400 to-purple-500 text-white font-bold py-4 px-8 rounded-xl hover:from-green-500 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 shadow-lg">
+                        🚀 開始挑戰
+                    </button>
+                    
+                    <button onclick="showMainMenu()" class="w-full bg-gray-500 text-white font-bold py-3 px-6 rounded-xl hover:bg-gray-600 transition-colors">
+                        返回主選單
+                    </button>
+                </div>
+            </div>
+
+            <!-- 遊戲進行中 -->
+            <div id="gameArea" class="hidden fade-in">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 id="stageTitle" class="text-2xl font-bold text-gray-800"></h2>
+                    <div class="text-right">
+                        <div class="text-lg font-bold text-blue-600">
+                            題目 <span id="questionNumber">1</span>/15
+                        </div>
+                        <div class="text-sm text-green-600 font-bold">
+                            正確率：<span id="currentAccuracy">0%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 進度條 -->
+                <div class="mb-6">
+                    <div class="flex justify-between text-sm text-gray-600 mb-2">
+                        <span>進度</span>
+                        <span id="progressText">階段一</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3">
+                        <div id="progressBar" class="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-500" style="width: 6.67%"></div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-xl p-6 mb-6 text-center">
+                    <div class="flex items-center justify-center gap-4 mb-4">
+                        <div id="questionText" class="text-3xl font-bold text-gray-800"></div>
+                        <button id="pronunciationBtn" onclick="speakCurrentWord()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
+                            🔊 發音
+                        </button>
+                    </div>
+                    
+                    <!-- 選擇題選項 -->
+                    <div id="choiceOptions" class="space-y-3">
+                        <div class="choice-container flex items-center gap-3">
+                            <button class="choice-btn flex-1 bg-white border-2 border-gray-300 text-gray-800 font-bold py-4 px-6 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all duration-200" onclick="selectChoice(0)"></button>
+                            <button class="choice-sound-btn bg-gray-200 hover:bg-gray-300 text-gray-600 px-3 py-2 rounded-lg transition-colors" onclick="speakChoiceWord(0)">🔊</button>
+                        </div>
+                        <div class="choice-container flex items-center gap-3">
+                            <button class="choice-btn flex-1 bg-white border-2 border-gray-300 text-gray-800 font-bold py-4 px-6 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all duration-200" onclick="selectChoice(1)"></button>
+                            <button class="choice-sound-btn bg-gray-200 hover:bg-gray-300 text-gray-600 px-3 py-2 rounded-lg transition-colors" onclick="speakChoiceWord(1)">🔊</button>
+                        </div>
+                        <div class="choice-container flex items-center gap-3">
+                            <button class="choice-btn flex-1 bg-white border-2 border-gray-300 text-gray-800 font-bold py-4 px-6 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all duration-200" onclick="selectChoice(2)"></button>
+                            <button class="choice-sound-btn bg-gray-200 hover:bg-gray-300 text-gray-600 px-3 py-2 rounded-lg transition-colors" onclick="speakChoiceWord(2)">🔊</button>
+                        </div>
+                        <div class="choice-container flex items-center gap-3">
+                            <button class="choice-btn flex-1 bg-white border-2 border-gray-300 text-gray-800 font-bold py-4 px-6 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all duration-200" onclick="selectChoice(3)"></button>
+                            <button class="choice-sound-btn bg-gray-200 hover:bg-gray-300 text-gray-600 px-3 py-2 rounded-lg transition-colors" onclick="speakChoiceWord(3)">🔊</button>
+                        </div>
+                    </div>
+
+                    <!-- 拼字拖拉 -->
+                    <div id="spellingInput" class="hidden">
+                        <div class="mb-4">
+                            <div class="text-lg font-bold text-gray-700 mb-1">點擊或拖拉字母卡片來拼出單字：</div>
+                            <div class="text-sm text-blue-600 mb-1">💡 提示：這個單字總共有 <span id="letterCount" class="font-bold">0</span> 個字母</div>
+                            <div class="text-sm text-green-600 font-bold mb-3">目前已選：<span id="selectedCount" class="font-bold">0</span> 個字母</div>
+                            <!-- 答案區域 -->
+                            <div id="answerArea" class="min-h-16 bg-white border-2 border-dashed border-gray-300 rounded-xl p-4 mb-4 flex items-center justify-center gap-2 flex-wrap">
+                                <div class="text-gray-400">將字母卡片拖拉到這裡</div>
+                            </div>
+                            <!-- 字母卡片區域 -->
+                            <div class="text-sm text-gray-600 mb-2">可用字母：</div>
+                            <div id="letterCards" class="flex flex-wrap gap-2 justify-center mb-4">
+                                <!-- 字母卡片會動態生成 -->
+                            </div>
+                            <div class="flex gap-3 justify-center">
+                                <button onclick="clearAnswer()" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-xl hover:bg-gray-600 transition-colors">
+                                    清除
+                                </button>
+                                <button onclick="checkSpelling()" class="bg-blue-500 text-white font-bold py-2 px-6 rounded-xl hover:bg-blue-600 transition-colors">
+                                    確認答案
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="feedback" class="text-center mb-4 text-lg font-bold"></div>
+                
+                <button id="nextBtn" onclick="nextQuestion()" class="hidden w-full bg-green-500 text-white font-bold py-3 px-6 rounded-xl hover:bg-green-600 transition-colors">
+                    下一題 (或按空白鍵)
+                </button>
+            </div>
+
+            <!-- 結果頁面 -->
+            <div id="resultArea" class="hidden text-center fade-in">
+                <div class="mb-6">
+                    <div id="resultEmoji" class="text-6xl mb-4">🎉</div>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">挑戰完成！</h2>
+                    
+                    <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 mb-6">
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div class="bg-white rounded-lg p-4">
+                                <div class="text-2xl font-bold text-blue-600" id="finalScore">15/15</div>
+                                <div class="text-sm text-gray-600">總得分</div>
+                            </div>
+                            <div class="bg-white rounded-lg p-4">
+                                <div class="text-2xl font-bold text-green-600" id="accuracyRate">100%</div>
+                                <div class="text-sm text-gray-600">正確率</div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-lg font-bold text-gray-700 mb-2" id="resultMessage">太棒了！全部答對！</div>
+                        <div class="text-sm text-gray-600">
+                            階段一：<span id="stage1Result">5/5</span> | 
+                            階段二：<span id="stage2Result">5/5</span> | 
+                            階段三：<span id="stage3Result">5/5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <button onclick="restartGame()" class="w-full bg-gradient-to-r from-green-400 to-blue-500 text-white font-bold py-4 px-8 rounded-xl hover:from-green-500 hover:to-blue-600 transform hover:scale-105 transition-all duration-200 shadow-lg">
+                        🔄 再次挑戰
+                    </button>
+                    <button onclick="showMainMenu()" class="w-full bg-gray-500 text-white font-bold py-3 px-6 rounded-xl hover:bg-gray-600 transition-colors">
+                        返回主選單
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 單字資料
+        const vocabulary = [
+            { english: 'balcony', chinese: '陽台' },
+            { english: 'band', chinese: '樂團' },
+            { english: 'barbecue', chinese: '烤肉' },
+            { english: 'bath', chinese: '洗澡' },
+            { english: 'bean', chinese: '豆' }
+        ];
+
+        // 遊戲狀態
+        let currentStage = 1;
+        let currentQuestion = 0;
+        let totalQuestions = 15;
+        let score = 0;
+        let stageScores = { stage1: 0, stage2: 0, stage3: 0 };
+        let questions = [];
+        let currentChoices = [];
+        let currentAnswer = [];
+        let questionAnswered = []; // 記錄每題是否已經答過（防止重複計分）
+        let gameStats = {
+            stage1: parseInt(localStorage.getItem('stage1Stats') || '0'),
+            stage2: parseInt(localStorage.getItem('stage2Stats') || '0'),
+            stage3: parseInt(localStorage.getItem('stage3Stats') || '0')
+        };
+
+        // 初始化
+        function init() {
+            updateStatsDisplay();
+        }
+
+        // 顯示主選單
+        function showMainMenu() {
+            hideAllScreens();
+            document.getElementById('mainMenu').classList.remove('hidden');
+        }
+
+        // 顯示教師登入
+        function showTeacherLogin() {
+            hideAllScreens();
+            document.getElementById('teacherLogin').classList.remove('hidden');
+            document.getElementById('teacherPassword').value = '';
+        }
+
+        // 檢查教師密碼
+        function checkTeacherPassword() {
+            const password = document.getElementById('teacherPassword').value;
+            if (password === '000000') {
+                hideAllScreens();
+                document.getElementById('teacherPanel').classList.remove('hidden');
+                updateStatsDisplay();
+            } else {
+                document.getElementById('teacherPassword').classList.add('shake');
+                setTimeout(() => {
+                    document.getElementById('teacherPassword').classList.remove('shake');
+                }, 500);
+                document.getElementById('teacherPassword').value = '';
+            }
+        }
+
+        // 更新統計顯示
+        function updateStatsDisplay() {
+            document.getElementById('stage1Stats').textContent = gameStats.stage1;
+            document.getElementById('stage2Stats').textContent = gameStats.stage2;
+            document.getElementById('stage3Stats').textContent = gameStats.stage3;
+        }
+
+        // 開始遊戲
+        function startGame() {
+            // 重置遊戲狀態
+            currentStage = 1;
+            currentQuestion = 0;
+            score = 0;
+            stageScores = { stage1: 0, stage2: 0, stage3: 0 };
+            questionAnswered = new Array(15).fill(false); // 初始化所有題目為未答過
+            generateAllQuestions();
+            hideAllScreens();
+            document.getElementById('gameArea').classList.remove('hidden');
+            showQuestion();
+        }
+
+        // 顯示遊戲說明
+        function showGameIntro() {
+            hideAllScreens();
+            document.getElementById('gameIntro').classList.remove('hidden');
+        }
+
+        // 重新開始遊戲
+        function restartGame() {
+            startGame();
+        }
+
+        // 生成所有題目
+        function generateAllQuestions() {
+            questions = [];
+            
+            // 階段一：英文選中文 (5題)
+            const stage1Questions = [...vocabulary].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < 5; i++) {
+                questions.push({
+                    ...stage1Questions[i],
+                    stage: 1,
+                    type: 'choice'
+                });
+            }
+            
+            // 階段二：中文選英文 (5題)
+            const stage2Questions = [...vocabulary].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < 5; i++) {
+                questions.push({
+                    ...stage2Questions[i],
+                    stage: 2,
+                    type: 'choice'
+                });
+            }
+            
+            // 階段三：拼字測驗 (5題)
+            const stage3Questions = [...vocabulary].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < 5; i++) {
+                questions.push({
+                    ...stage3Questions[i],
+                    stage: 3,
+                    type: 'spelling'
+                });
+            }
+        }
+
+        // 顯示題目
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            currentStage = question.stage;
+            
+            // 更新題目編號和進度
+            document.getElementById('questionNumber').textContent = currentQuestion + 1;
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('nextBtn').classList.add('hidden');
+            
+            // 更新正確率顯示
+            if (currentQuestion === 0) {
+                document.getElementById('currentAccuracy').textContent = '0%';
+            } else {
+                updateAccuracyDisplay();
+            }
+            
+            // 更新階段標題和進度文字
+            const titles = {
+                1: '🎯 階段一：英文選中文',
+                2: '🎯 階段二：中文選英文',
+                3: '✏️ 階段三：拼字測驗'
+            };
+            document.getElementById('stageTitle').textContent = titles[currentStage];
+            document.getElementById('progressText').textContent = `階段${currentStage === 1 ? '一' : currentStage === 2 ? '二' : '三'}`;
+            
+            // 更新進度條
+            const progress = ((currentQuestion + 1) / totalQuestions) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            
+            // 根據階段顯示不同顏色的進度條
+            const progressBar = document.getElementById('progressBar');
+            if (currentStage === 1) {
+                progressBar.className = 'bg-gradient-to-r from-green-400 to-green-600 h-3 rounded-full transition-all duration-500';
+            } else if (currentStage === 2) {
+                progressBar.className = 'bg-gradient-to-r from-blue-400 to-blue-600 h-3 rounded-full transition-all duration-500';
+            } else {
+                progressBar.className = 'bg-gradient-to-r from-purple-400 to-purple-600 h-3 rounded-full transition-all duration-500';
+            }
+
+            if (question.type === 'choice') {
+                // 選擇題
+                if (currentStage === 1) {
+                    // 英文選中文
+                    document.getElementById('questionText').textContent = question.english;
+                    const choices = generateChoices(question.chinese, 'chinese');
+                    currentChoices = choices;
+                    setupChoiceButtons(choices);
+                } else {
+                    // 中文選英文
+                    document.getElementById('questionText').textContent = question.chinese;
+                    const choices = generateChoices(question.english, 'english');
+                    currentChoices = choices;
+                    setupChoiceButtons(choices);
+                }
+                document.getElementById('choiceOptions').classList.remove('hidden');
+                document.getElementById('spellingInput').classList.add('hidden');
+                
+            } else {
+                // 拼字測驗
+                document.getElementById('questionText').textContent = question.chinese;
+                document.getElementById('choiceOptions').classList.add('hidden');
+                document.getElementById('spellingInput').classList.remove('hidden');
+                setupSpellingCards(question.english);
+            }
+        }
+        
+        // 設置選擇題按鈕
+        function setupChoiceButtons(choices) {
+            const buttons = document.querySelectorAll('.choice-btn');
+            const soundButtons = document.querySelectorAll('.choice-sound-btn');
+            
+            buttons.forEach((btn, index) => {
+                btn.textContent = choices[index];
+                btn.className = 'choice-btn flex-1 bg-white border-2 border-gray-300 text-gray-800 font-bold py-4 px-6 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all duration-200';
+                btn.onclick = () => selectChoice(index);
+            });
+            
+            // 設置發音按鈕的顯示狀態
+            soundButtons.forEach((btn, index) => {
+                // 在階段一和階段二都顯示發音按鈕
+                if (currentStage === 1 || currentStage === 2) {
+                    btn.style.display = 'block';
+                } else {
+                    btn.style.display = 'none';
+                }
+            });
+        }
+
+        // 生成選擇題選項
+        function generateChoices(correctAnswer, type) {
+            const choices = [correctAnswer];
+            const otherWords = vocabulary.filter(word => 
+                type === 'chinese' ? word.chinese !== correctAnswer : word.english !== correctAnswer
+            );
+            
+            while (choices.length < 4) {
+                const randomWord = otherWords[Math.floor(Math.random() * otherWords.length)];
+                const option = type === 'chinese' ? randomWord.chinese : randomWord.english;
+                if (!choices.includes(option)) {
+                    choices.push(option);
+                }
+            }
+            
+            return choices.sort(() => Math.random() - 0.5);
+        }
+
+        // 選擇答案
+        function selectChoice(index) {
+            const question = questions[currentQuestion];
+            const selectedBtn = document.querySelectorAll('.choice-btn')[index];
+            const selectedAnswer = selectedBtn.textContent;
+            
+            let correctAnswer;
+            if (currentStage === 1) {
+                correctAnswer = question.chinese;
+            } else {
+                correctAnswer = question.english;
+            }
+            
+            const buttons = document.querySelectorAll('.choice-btn');
+            buttons.forEach(btn => {
+                btn.onclick = null;
+                if (btn.textContent === correctAnswer) {
+                    btn.className = 'choice-btn flex-1 bg-green-500 border-2 border-green-500 text-white font-bold py-4 px-6 rounded-xl';
+                } else if (btn === selectedBtn && selectedAnswer !== correctAnswer) {
+                    btn.className = 'choice-btn flex-1 bg-red-500 border-2 border-red-500 text-white font-bold py-4 px-6 rounded-xl';
+                }
+            });
+            
+            if (selectedAnswer === correctAnswer) {
+                // 只有第一次答對才計分
+                if (!questionAnswered[currentQuestion]) {
+                    score++;
+                    stageScores[`stage${currentStage}`]++;
+                }
+                document.getElementById('feedback').innerHTML = '<span class="text-green-600">✅ 答對了！</span>';
+                selectedBtn.classList.add('bounce');
+            } else {
+                document.getElementById('feedback').innerHTML = '<span class="text-red-600">❌ 答錯了！</span>';
+                selectedBtn.classList.add('shake');
+            }
+            
+            // 標記這題已經答過
+            questionAnswered[currentQuestion] = true;
+            
+            // 更新正確率顯示
+            updateAccuracyDisplay();
+            
+            document.getElementById('nextBtn').classList.remove('hidden');
+        }
+
+        // 檢查拼字
+        function checkSpelling() {
+            const userAnswer = currentAnswer.join('').toLowerCase();
+            const correctAnswer = questions[currentQuestion].english.toLowerCase();
+            
+            const answerArea = document.getElementById('answerArea');
+            
+            if (userAnswer === correctAnswer) {
+                // 只有第一次答對才計分
+                if (!questionAnswered[currentQuestion]) {
+                    score++;
+                    stageScores[`stage${currentStage}`]++;
+                }
+                document.getElementById('feedback').innerHTML = '<span class="text-green-600">✅ 拼字正確！</span>';
+                answerArea.className = 'min-h-16 bg-green-50 border-2 border-green-500 rounded-xl p-4 mb-4 flex items-center justify-center gap-2 flex-wrap';
+            } else {
+                document.getElementById('feedback').innerHTML = `<span class="text-red-600">❌ 答錯了！正確答案是：${questions[currentQuestion].english}</span>`;
+                answerArea.className = 'min-h-16 bg-red-50 border-2 border-red-500 rounded-xl p-4 mb-4 flex items-center justify-center gap-2 flex-wrap';
+            }
+            
+            // 標記這題已經答過
+            questionAnswered[currentQuestion] = true;
+            
+            // 更新正確率顯示
+            updateAccuracyDisplay();
+            
+            document.getElementById('nextBtn').classList.remove('hidden');
+        }
+
+        // 下一題
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < totalQuestions) {
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        // 顯示結果
+        function showResult() {
+            // 更新統計 - 只有完成全部15題才算完成
+            gameStats.stage1++;
+            gameStats.stage2++;
+            gameStats.stage3++;
+            localStorage.setItem('stage1Stats', gameStats.stage1);
+            localStorage.setItem('stage2Stats', gameStats.stage2);
+            localStorage.setItem('stage3Stats', gameStats.stage3);
+            
+            hideAllScreens();
+            document.getElementById('resultArea').classList.remove('hidden');
+            
+            // 計算正確率
+            const accuracy = Math.round((score / totalQuestions) * 100);
+            
+            // 更新結果顯示
+            document.getElementById('finalScore').textContent = `${score}/${totalQuestions}`;
+            document.getElementById('accuracyRate').textContent = `${accuracy}%`;
+            document.getElementById('stage1Result').textContent = `${stageScores.stage1}/5`;
+            document.getElementById('stage2Result').textContent = `${stageScores.stage2}/5`;
+            document.getElementById('stage3Result').textContent = `${stageScores.stage3}/5`;
+            
+            // 根據正確率顯示不同的訊息和表情
+            let message, emoji;
+            if (accuracy >= 90) {
+                message = '太棒了！幾乎全部答對！';
+                emoji = '🎉';
+            } else if (accuracy >= 80) {
+                message = '很好！表現優秀！';
+                emoji = '👏';
+            } else if (accuracy >= 70) {
+                message = '不錯！繼續加油！';
+                emoji = '👍';
+            } else if (accuracy >= 60) {
+                message = '還可以，多練習會更好！';
+                emoji = '💪';
+            } else {
+                message = '需要多加練習喔！';
+                emoji = '📚';
+            }
+            
+            document.getElementById('resultMessage').textContent = message;
+            document.getElementById('resultEmoji').textContent = emoji;
+        }
+
+        // 隱藏所有畫面
+        function hideAllScreens() {
+            const screens = ['mainMenu', 'teacherLogin', 'teacherPanel', 'gameIntro', 'gameArea', 'resultArea'];
+            screens.forEach(screen => {
+                document.getElementById(screen).classList.add('hidden');
+            });
+        }
+
+        // 語音發音功能
+        function speakWord(word) {
+            if ('speechSynthesis' in window) {
+                // 停止任何正在播放的語音
+                speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.8;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+                
+                speechSynthesis.speak(utterance);
+            } else {
+                // 如果瀏覽器不支援語音合成，顯示提示
+                const feedback = document.createElement('div');
+                feedback.className = 'fixed top-4 right-4 bg-yellow-500 text-white px-4 py-2 rounded-lg z-50';
+                feedback.textContent = '您的瀏覽器不支援語音功能';
+                document.body.appendChild(feedback);
+                
+                setTimeout(() => {
+                    document.body.removeChild(feedback);
+                }, 3000);
+            }
+        }
+
+        // 發音當前題目單字
+        function speakCurrentWord() {
+            const question = questions[currentQuestion];
+            if (currentStage === 1 || currentStage === 3) {
+                // 階段一和三：發音英文單字
+                speakWord(question.english);
+            } else {
+                // 階段二：發音英文單字（雖然題目顯示中文）
+                speakWord(question.english);
+            }
+        }
+
+        // 發音選項單字
+        function speakChoiceWord(index) {
+            const question = questions[currentQuestion];
+            
+            if (currentStage === 1) {
+                // 階段一：中文選項對應的英文發音
+                const chineseChoice = currentChoices[index];
+                const englishWord = vocabulary.find(word => word.chinese === chineseChoice);
+                if (englishWord) {
+                    speakWord(englishWord.english);
+                }
+            } else if (currentStage === 2 && currentChoices[index]) {
+                // 階段二：直接發音英文選項
+                speakWord(currentChoices[index]);
+            }
+        }
+
+        // 設置拼字卡片
+        function setupSpellingCards(word) {
+            currentAnswer = [];
+            const answerArea = document.getElementById('answerArea');
+            const letterCards = document.getElementById('letterCards');
+            
+            // 清空區域
+            answerArea.innerHTML = '<div class="text-gray-400">將字母卡片拖拉到這裡</div>';
+            letterCards.innerHTML = '';
+            
+            // 顯示字母數量提示
+            document.getElementById('letterCount').textContent = word.length;
+            // 初始化已選字母計數
+            document.getElementById('selectedCount').textContent = '0';
+            
+            // 生成字母卡片（包含正確答案的字母和一些干擾字母）
+            const correctLetters = word.toLowerCase().split('');
+            const distractorLetters = ['a', 'e', 'i', 'o', 'u', 'r', 's', 't', 'n', 'l'];
+            
+            // 合併字母並打亂
+            const allLetters = [...correctLetters];
+            
+            // 添加一些干擾字母（但不要太多）
+            const numDistractors = Math.min(3, Math.max(1, Math.floor(correctLetters.length / 2)));
+            for (let i = 0; i < numDistractors; i++) {
+                const randomLetter = distractorLetters[Math.floor(Math.random() * distractorLetters.length)];
+                if (!allLetters.includes(randomLetter)) {
+                    allLetters.push(randomLetter);
+                }
+            }
+            
+            // 打亂字母順序
+            allLetters.sort(() => Math.random() - 0.5);
+            
+            // 創建字母卡片
+            allLetters.forEach((letter, index) => {
+                const card = document.createElement('div');
+                card.className = 'letter-card bg-blue-500 text-white font-bold px-4 py-2 rounded-lg shadow-md cursor-pointer';
+                card.textContent = letter;
+                card.draggable = true;
+                card.dataset.letter = letter;
+                card.dataset.cardId = index;
+                
+                // 拖拉事件
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragend', handleDragEnd);
+                
+                // 點擊事件 - 自動移動到答案區
+                card.addEventListener('click', () => {
+                    const letter = card.dataset.letter;
+                    currentAnswer.push(letter);
+                    card.remove();
+                    updateAnswerArea();
+                });
+                
+                letterCards.appendChild(card);
+            });
+            
+            // 設置答案區域的拖放事件
+            answerArea.addEventListener('dragover', handleDragOver);
+            answerArea.addEventListener('drop', handleDrop);
+        }
+
+        // 拖拉開始
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.dataset.cardId);
+            e.target.classList.add('dragging');
+        }
+
+        // 拖拉結束
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        // 拖拉經過
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drop-zone');
+        }
+
+        // 放下
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drop-zone');
+            
+            const cardId = e.dataTransfer.getData('text/plain');
+            const draggedCard = document.querySelector(`[data-card-id="${cardId}"]`);
+            
+            if (draggedCard) {
+                const letter = draggedCard.dataset.letter;
+                currentAnswer.push(letter);
+                
+                // 移除原卡片
+                draggedCard.remove();
+                
+                // 更新答案區域顯示
+                updateAnswerArea();
+            }
+        }
+
+        // 更新答案區域顯示
+        function updateAnswerArea() {
+            const answerArea = document.getElementById('answerArea');
+            
+            if (currentAnswer.length === 0) {
+                answerArea.innerHTML = '<div class="text-gray-400">將字母卡片拖拉到這裡</div>';
+            } else {
+                answerArea.innerHTML = currentAnswer.map((letter, index) => 
+                    `<div class="answer-slot bg-blue-100 border-2 border-blue-300 rounded-lg px-3 py-2 font-bold text-blue-800 cursor-pointer" onclick="removeLetter(${index})">${letter}</div>`
+                ).join('');
+            }
+            
+            // 更新已選字母計數
+            document.getElementById('selectedCount').textContent = currentAnswer.length;
+        }
+
+        // 移除字母
+        function removeLetter(index) {
+            const removedLetter = currentAnswer.splice(index, 1)[0];
+            
+            // 重新創建字母卡片
+            const letterCards = document.getElementById('letterCards');
+            const card = document.createElement('div');
+            card.className = 'letter-card bg-blue-500 text-white font-bold px-4 py-2 rounded-lg shadow-md cursor-pointer';
+            card.textContent = removedLetter;
+            card.draggable = true;
+            card.dataset.letter = removedLetter;
+            card.dataset.cardId = Date.now(); // 使用時間戳作為唯一ID
+            
+            card.addEventListener('dragstart', handleDragStart);
+            card.addEventListener('dragend', handleDragEnd);
+            
+            // 點擊事件 - 自動移動到答案區
+            card.addEventListener('click', () => {
+                const letter = card.dataset.letter;
+                currentAnswer.push(letter);
+                card.remove();
+                updateAnswerArea();
+            });
+            
+            letterCards.appendChild(card);
+            
+            // 更新答案區域
+            updateAnswerArea();
+        }
+
+        // 清除答案
+        function clearAnswer() {
+            // 將所有答案字母重新放回字母卡片區域
+            const letterCards = document.getElementById('letterCards');
+            
+            currentAnswer.forEach(letter => {
+                const card = document.createElement('div');
+                card.className = 'letter-card bg-blue-500 text-white font-bold px-4 py-2 rounded-lg shadow-md cursor-pointer';
+                card.textContent = letter;
+                card.draggable = true;
+                card.dataset.letter = letter;
+                card.dataset.cardId = Date.now() + Math.random(); // 使用時間戳+隨機數作為唯一ID
+                
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragend', handleDragEnd);
+                
+                // 點擊事件 - 自動移動到答案區
+                card.addEventListener('click', () => {
+                    const letter = card.dataset.letter;
+                    currentAnswer.push(letter);
+                    card.remove();
+                    updateAnswerArea();
+                });
+                
+                letterCards.appendChild(card);
+            });
+            
+            currentAnswer = [];
+            updateAnswerArea();
+            
+            // 重置答案區域樣式
+            const answerArea = document.getElementById('answerArea');
+            answerArea.className = 'min-h-16 bg-white border-2 border-dashed border-gray-300 rounded-xl p-4 mb-4 flex items-center justify-center gap-2 flex-wrap';
+        }
+
+        // 更新正確率顯示
+        function updateAccuracyDisplay() {
+            const currentAccuracy = Math.round((score / (currentQuestion + 1)) * 100);
+            document.getElementById('currentAccuracy').textContent = currentAccuracy + '%';
+        }
+
+        // 鍵盤事件監聽
+        document.addEventListener('keydown', function(event) {
+            // 空白鍵快捷鍵
+            if (event.code === 'Space') {
+                event.preventDefault(); // 防止頁面滾動
+                
+                // 檢查是否在遊戲進行中且下一題按鈕可見
+                const nextBtn = document.getElementById('nextBtn');
+                const gameArea = document.getElementById('gameArea');
+                
+                if (!gameArea.classList.contains('hidden') && !nextBtn.classList.contains('hidden')) {
+                    nextQuestion();
+                }
+            }
+        });
+
+        // 初始化遊戲
+        init();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98ec9a5ec2198412',t:'MTc2MDUwMjg1NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
