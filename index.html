@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>學習扶助每天考試網</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-full">
+    <div class="container mx-auto px-4 py-8">
+        <!-- 標題區域 -->
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-bold text-white mb-4">📚 學習扶助每天考試網</h1>
+            <p class="text-xl text-blue-100 mb-2">每日練習，穩步提升</p>
+
+        </div>
+
+        <!-- 考試列表 -->
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-2xl shadow-2xl p-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">📝 考試列表</h2>
+                
+                <div id="examList" class="space-y-4">
+                    <!-- 現有考試 -->
+                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 card-hover border-l-4 border-blue-500">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div class="bg-blue-500 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-lg">
+                                    1
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-800">1141016 (四)</h3>
+                                    <p class="text-gray-600">單字測驗</p>
+                                </div>
+                            </div>
+                            <a href="https://issac-sjps.github.io/VocabularyTest/1141016" 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2">
+                                <span>開始考試</span>
+                                <span>🚀</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+
+
+        <!-- 頁尾 -->
+        <div class="text-center mt-12">
+            <p class="text-blue-100">💪 持續學習，成就更好的自己！</p>
+        </div>
+    </div>
+
+    <script>
+        // 頁面載入完成後的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('學習扶助考試網站已載入');
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98ec4b6e709f8412',t:'MTc2MDQ5OTYyMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
