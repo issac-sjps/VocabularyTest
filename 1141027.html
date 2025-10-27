@@ -149,6 +149,11 @@
                 <!-- 選項會動態生成 -->
             </div>
 
+            <!-- 答題結果訊息 -->
+            <div class="text-center mb-6 hidden" id="feedbackMessage">
+                <!-- 答題結果會動態顯示 -->
+            </div>
+
             <!-- 拖拉拼字區域 -->
             <div class="max-w-3xl mx-auto hidden" id="spellingContainer">
                 <div class="text-center mb-6">
@@ -403,8 +408,9 @@
                 setupMultipleChoice();
             }
             
-            // 隱藏下一題按鈕
+            // 隱藏下一題按鈕和回饋訊息
             document.getElementById('nextBtn').classList.add('hidden');
+            document.getElementById('feedbackMessage').classList.add('hidden');
             selectedAnswer = null;
             
             // 更新鍵盤提示
@@ -421,9 +427,25 @@
                 button.className = 'bg-gray-50 hover:bg-blue-50 border-2 border-gray-200 hover:border-blue-400 p-4 rounded-xl text-lg font-semibold transition-all transform hover:scale-105 flex items-center justify-between';
                 button.innerHTML = `
                     <span>${option}</span>
-                    <button class="bg-blue-500 hover:bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center ml-2 transition-all" onclick="event.stopPropagation(); speakText('${option}')">🔊</button>
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center ml-2 transition-all">🔊</button>
                 `;
+                
+                // 設置主按鈕點擊事件
                 button.onclick = () => selectAnswer(index, option);
+                
+                // 設置發音按鈕點擊事件
+                const speakBtn = button.querySelector('button');
+                speakBtn.onclick = (event) => {
+                    event.stopPropagation();
+                    // 根據階段決定要發音的內容
+                    if (question.stage === 1) {
+                        // 階段一：英文選中文，發音英文單字
+                        speakText(question.word);
+                    } else if (question.stage === 2) {
+                        // 階段二：中文選英文，發音選項中的英文單字
+                        speakText(option);
+                    }
+                };
                 container.appendChild(button);
             });
         }
@@ -434,10 +456,11 @@
             selectedAnswer = answer;
             const question = questions[currentQuestionIndex];
             const buttons = document.querySelectorAll('#optionsContainer button');
+            const isCorrect = answer === question.correctAnswer;
             
             buttons.forEach((button, i) => {
                 if (i === index) {
-                    if (answer === question.correctAnswer) {
+                    if (isCorrect) {
                         button.className = button.className.replace('bg-gray-50 hover:bg-blue-50 border-gray-200 hover:border-blue-400', 'bg-green-100 border-green-500');
                         score++;
                         stageScores[question.stage - 1]++;
@@ -450,8 +473,42 @@
                 button.onclick = null;
             });
             
+            // 顯示答題結果訊息
+            showAnswerFeedback(isCorrect, question);
+            
             document.getElementById('nextBtn').classList.remove('hidden');
             updateKeyboardHint();
+        }
+
+        // 顯示答題結果回饋
+        function showAnswerFeedback(isCorrect, question) {
+            const feedbackDiv = document.getElementById('feedbackMessage');
+            feedbackDiv.classList.remove('hidden');
+            
+            if (isCorrect) {
+                feedbackDiv.innerHTML = `
+                    <div class="bg-green-50 border-2 border-green-200 rounded-2xl p-6 max-w-md mx-auto">
+                        <div class="text-4xl mb-2">🎉</div>
+                        <div class="text-2xl font-bold text-green-600 mb-2">答對了！</div>
+                        <div class="text-lg text-gray-700">
+                            <strong>${question.word}</strong> = ${question.meaning}
+                        </div>
+                    </div>
+                `;
+            } else {
+                feedbackDiv.innerHTML = `
+                    <div class="bg-red-50 border-2 border-red-200 rounded-2xl p-6 max-w-md mx-auto">
+                        <div class="text-4xl mb-2">😔</div>
+                        <div class="text-2xl font-bold text-red-600 mb-2">答錯了</div>
+                        <div class="text-lg text-gray-700 mb-2">
+                            正確答案：<span class="font-bold text-green-600">${question.correctAnswer}</span>
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <strong>${question.word}</strong> = ${question.meaning}
+                        </div>
+                    </div>
+                `;
+            }
         }
 
         // 拼字功能
@@ -819,5 +876,5 @@
         // 初始化
         showHome();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'994ff53e375b073c',t:'MTc2MTU0NDY2OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'994ff96a4409073c',t:'MTc2MTU0NDgzOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
