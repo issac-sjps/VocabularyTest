@@ -115,12 +115,7 @@
                 </div>
             </div>
             
-            <div class="bg-gray-50 rounded-2xl p-6 mb-6">
-                <h3 class="text-xl font-bold text-gray-700 mb-4">📊 學生進度</h3>
-                <div class="space-y-3" id="studentProgress">
-                    <!-- 學生進度會動態生成 -->
-                </div>
-            </div>
+
             
             <button onclick="showHome()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-full transition-all">
                 返回首頁
@@ -225,6 +220,26 @@
         按空白鍵：下一題 ⌨️
     </div>
 
+    <!-- 自定義密碼輸入框 -->
+    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden" id="passwordModal">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4 text-center">教師管理區</h3>
+            <p class="text-gray-600 mb-6 text-center">請輸入管理密碼</p>
+            <div class="mb-6">
+                <label for="passwordInput" class="block text-sm font-medium text-gray-700 mb-2">密碼</label>
+                <input type="password" id="passwordInput" class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:outline-none text-lg" placeholder="請輸入密碼">
+            </div>
+            <div class="flex gap-3">
+                <button onclick="cancelPassword()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl transition-all">
+                    取消
+                </button>
+                <button onclick="confirmPassword()" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl transition-all">
+                    確認
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // 單字庫
         const vocabulary = [
@@ -262,10 +277,35 @@
         }
 
         function showTeacherPanel() {
-            document.getElementById('homePage').classList.add('hidden');
-            document.getElementById('teacherPanel').classList.remove('hidden');
-            updateVocabList();
-            updateStudentProgress();
+            // 顯示自定義密碼輸入框
+            document.getElementById('passwordModal').classList.remove('hidden');
+            document.getElementById('passwordInput').focus();
+        }
+
+        function cancelPassword() {
+            document.getElementById('passwordModal').classList.add('hidden');
+            document.getElementById('passwordInput').value = '';
+        }
+
+        function confirmPassword() {
+            const password = document.getElementById('passwordInput').value;
+            if (password === '000000') {
+                document.getElementById('passwordModal').classList.add('hidden');
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('homePage').classList.add('hidden');
+                document.getElementById('teacherPanel').classList.remove('hidden');
+                updateVocabList();
+            } else {
+                // 顯示錯誤訊息
+                const input = document.getElementById('passwordInput');
+                input.style.borderColor = '#ef4444';
+                input.value = '';
+                input.placeholder = '密碼錯誤，請重新輸入';
+                setTimeout(() => {
+                    input.style.borderColor = '#d1d5db';
+                    input.placeholder = '請輸入密碼';
+                }, 2000);
+            }
         }
 
         function updateVocabList() {
@@ -283,35 +323,7 @@
             });
         }
 
-        function updateStudentProgress() {
-            const progressContainer = document.getElementById('studentProgress');
-            const mockStudents = [
-                { name: '學生A', completed: 15, score: 13 },
-                { name: '學生B', completed: 12, score: 10 },
-                { name: '學生C', completed: 8, score: 6 },
-                { name: '學生D', completed: 15, score: 15 },
-                { name: '學生E', completed: 5, score: 4 }
-            ];
 
-            progressContainer.innerHTML = '';
-            mockStudents.forEach(student => {
-                const percentage = Math.round((student.completed / 15) * 100);
-                const accuracy = student.completed > 0 ? Math.round((student.score / student.completed) * 100) : 0;
-                
-                const item = document.createElement('div');
-                item.className = 'flex justify-between items-center bg-white p-3 rounded-lg';
-                item.innerHTML = `
-                    <div>
-                        <div class="font-bold">${student.name}</div>
-                        <div class="text-sm text-gray-600">進度: ${student.completed}/15 (${percentage}%) | 正確率: ${accuracy}%</div>
-                    </div>
-                    <div class="text-lg font-bold ${accuracy >= 80 ? 'text-green-600' : accuracy >= 60 ? 'text-yellow-600' : 'text-red-600'}">
-                        ${student.score}/${student.completed}
-                    </div>
-                `;
-                progressContainer.appendChild(item);
-            });
-        }
 
         // 測驗控制
         function startQuiz() {
@@ -855,6 +867,16 @@
 
         // 鍵盤快捷鍵
         document.addEventListener('keydown', function(event) {
+            // 如果密碼輸入框可見，處理 Enter 鍵
+            if (!document.getElementById('passwordModal').classList.contains('hidden')) {
+                if (event.code === 'Enter') {
+                    confirmPassword();
+                } else if (event.code === 'Escape') {
+                    cancelPassword();
+                }
+                return;
+            }
+            
             // 空白鍵：下一題或確認答案
             if (event.code === 'Space') {
                 event.preventDefault(); // 防止頁面滾動
@@ -876,5 +898,5 @@
         // 初始化
         showHome();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'994ff96a4409073c',t:'MTc2MTU0NDgzOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99500f21c1b9073c',t:'MTc2MTU0NTcyOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
