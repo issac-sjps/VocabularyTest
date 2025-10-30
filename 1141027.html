@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>英文單字測驗系統</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>英文單字測驗系統</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
         body {
             box-sizing: border-box;
         }
@@ -50,209 +50,161 @@
             60% { transform: translateY(-5px); }
         }
     </style>
-</head>
-<body class="min-h-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500">
-    <div class="container mx-auto max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden">
-        <!-- 標題區域 -->
-        <header class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-8 text-center relative">
-            <div class="absolute top-4 right-4 hidden" id="headerButtons">
-                <button onclick="showHome()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-full text-sm mr-2 transition-all">
-                    🏠 首頁
-                </button>
-                <button onclick="restartQuiz()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-full text-sm transition-all">
-                    🔄 重新開始
-                </button>
-            </div>
-            <h1 class="text-4xl font-bold mb-2" id="pageTitle">英文單字測驗系統</h1>
-            <div class="w-full bg-white/20 rounded-full h-2 mt-4 hidden" id="progressContainer">
-                <div class="bg-white h-2 rounded-full transition-all duration-500" id="progressBar" style="width: 0%"></div>
-            </div>
-        </header>
-
-        <!-- 首頁 -->
-        <div class="p-8 text-center" id="homePage">
-            <h2 class="text-3xl font-bold text-gray-800 mb-8">歡迎來到英文單字測驗</h2>
-            
-            <div class="grid md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl border-2 border-blue-200 hover:border-blue-400 transition-all hover:transform hover:scale-105">
-                    <div class="text-3xl font-bold text-blue-600 mb-2">1-5</div>
-                    <div class="text-xl font-semibold mb-2">英文選中文</div>
-                    <div class="text-gray-600">看英文單字，選擇正確的中文意思</div>
-                </div>
-                
-                <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-2xl border-2 border-green-200 hover:border-green-400 transition-all hover:transform hover:scale-105">
-                    <div class="text-3xl font-bold text-green-600 mb-2">6-10</div>
-                    <div class="text-xl font-semibold mb-2">中文選英文</div>
-                    <div class="text-gray-600">看中文意思，選擇正確的英文單字</div>
-                </div>
-                
-                <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl border-2 border-purple-200 hover:border-purple-400 transition-all hover:transform hover:scale-105">
-                    <div class="text-3xl font-bold text-purple-600 mb-2">11-15</div>
-                    <div class="text-xl font-semibold mb-2">拖拉拼字</div>
-                    <div class="text-gray-600">拖拉字母卡片拼出正確單字</div>
-                </div>
-            </div>
-            
-            <button onclick="startQuiz()" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-full text-xl transition-all transform hover:scale-105 shadow-lg">
-                🚀 開始測驗 (15題)
-            </button>
-            
-            <div class="mt-6">
-                <button onclick="showTeacherPanel()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full transition-all">
-                    👨‍🏫 教師管理區
-                </button>
-            </div>
-        </div>
-
-        <!-- 教師管理區 -->
-        <div class="p-8 hidden" id="teacherPanel">
-            <h2 class="text-3xl font-bold text-gray-800 mb-6">教師管理區</h2>
-            
-            <div class="bg-gray-50 rounded-2xl p-6 mb-6">
-                <h3 class="text-xl font-bold text-gray-700 mb-4">📚 單字庫</h3>
-                <div class="grid gap-3" id="vocabList">
-                    <!-- 單字列表會動態生成 -->
-                </div>
-            </div>
-            
-
-            
-            <button onclick="showHome()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-full transition-all">
-                返回首頁
-            </button>
-        </div>
-
-        <!-- 測驗區域 -->
-        <div class="p-8 hidden" id="quizArea">
-            <div class="text-center mb-6">
-                <div class="text-lg text-gray-600 mb-2" id="questionCounter">第 1 題 / 15 題</div>
-                <div class="text-sm text-gray-500" id="stageInfo">階段一：英文選中文</div>
-            </div>
-
-            <!-- 題目顯示 -->
-            <div class="text-center mb-8">
-                <div class="flex items-center justify-center gap-4 mb-4">
-                    <div class="text-5xl font-bold text-gray-800" id="questionWord">beautiful</div>
-                    <button onclick="speakWord()" class="bg-blue-500 hover:bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110">
-                        🔊
-                    </button>
-                </div>
-            </div>
-
-            <!-- 選擇題選項 -->
-            <div class="grid grid-cols-2 gap-4 max-w-2xl mx-auto mb-8" id="optionsContainer">
-                <!-- 選項會動態生成 -->
-            </div>
-
-            <!-- 答題結果訊息 -->
-            <div class="text-center mb-6 hidden" id="feedbackMessage">
-                <!-- 答題結果會動態顯示 -->
-            </div>
-
-            <!-- 拖拉拼字區域 -->
-            <div class="max-w-3xl mx-auto hidden" id="spellingContainer">
-                <div class="text-center mb-6">
-                    <div class="text-lg font-bold text-gray-700 mb-2">拖拉字母卡片來拼出單字：</div>
-                    <div class="text-sm text-blue-600 mb-2">💡 提示：這個單字總共有 <span id="letterCount" class="font-bold">0</span> 個字母</div>
-                    <div class="text-sm text-green-600 font-bold">目前已選：<span id="selectedCount" class="font-bold">0</span> 個字母</div>
-                </div>
-
-                <!-- 答案區域 -->
-                <div id="answerArea" class="answer-area min-h-20 bg-gray-50 border-3 border-dashed border-gray-300 rounded-2xl p-6 mb-6 flex items-center justify-center gap-2 flex-wrap transition-all">
-                    <div class="text-gray-400 text-lg">將字母卡片拖拉到這裡</div>
-                </div>
-
-                <!-- 字母卡片區域 -->
-                <div class="text-center mb-4">
-                    <div class="text-sm text-gray-600 mb-3">可用字母：</div>
-                    <div id="letterCards" class="flex flex-wrap gap-3 justify-center mb-6">
-                        <!-- 字母卡片會動態生成 -->
-                    </div>
-                </div>
-
-                <div class="flex gap-4 justify-center">
-                    <button onclick="clearAnswer()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl transition-all">
-                        🗑️ 清除
-                    </button>
-                    <button onclick="checkSpelling()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl transition-all" id="checkBtn">
-                        ✅ 確認答案
-                    </button>
-                </div>
-            </div>
-
-            <!-- 下一題按鈕 -->
-            <div class="text-center mt-8">
-                <button onclick="nextQuestion()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-xl transition-all hidden" id="nextBtn">
-                    ➡️ 下一題
-                </button>
-            </div>
-        </div>
-
-        <!-- 結果頁面 -->
-        <div class="p-8 text-center hidden" id="resultsPage">
-            <div class="mb-8">
-                <div class="text-6xl mb-4">🎉</div>
-                <h2 class="text-4xl font-bold text-gray-800 mb-4">測驗完成！</h2>
-                <div class="text-6xl font-bold text-green-600 mb-2" id="finalScore">15/15</div>
-                <div class="text-xl text-gray-600" id="scoreMessage">恭喜！全部答對了！</div>
-            </div>
-
-            <div class="bg-gray-50 rounded-2xl p-6 mb-8">
-                <h3 class="text-xl font-bold text-gray-700 mb-4">📊 詳細成績</h3>
-                <div class="grid grid-cols-3 gap-4" id="stageScores">
-                    <!-- 各階段成績會動態生成 -->
-                </div>
-            </div>
-
-            <div class="flex gap-4 justify-center">
-                <button onclick="restartQuiz()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl transition-all">
-                    🔄 重新測驗
-                </button>
-                <button onclick="showHome()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl transition-all">
-                    🏠 返回首頁
-                </button>
-            </div>
-        </div>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="min-h-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500">
+  <div class="container mx-auto max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden"><!-- 標題區域 -->
+   <header class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-8 text-center relative">
+    <div class="absolute top-4 right-4 hidden" id="headerButtons"><button onclick="showHome()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-full text-sm mr-2 transition-all"> 🏠 首頁 </button> <button onclick="restartQuiz()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-full text-sm transition-all"> 🔄 重新開始 </button>
     </div>
-
-    <!-- 鍵盤提示 -->
-    <div class="fixed bottom-4 right-4 bg-black/80 text-white px-4 py-2 rounded-full text-sm backdrop-blur-sm hidden" id="keyboardHint">
-        按空白鍵：下一題 ⌨️
+    <h1 class="text-4xl font-bold mb-2" id="pageTitle">英文單字測驗系統</h1>
+    <div class="w-full bg-white/20 rounded-full h-2 mt-4 hidden" id="progressContainer">
+     <div class="bg-white h-2 rounded-full transition-all duration-500" id="progressBar" style="width: 0%"></div>
     </div>
-
-    <!-- 自定義密碼輸入框 -->
-    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden" id="passwordModal">
-        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
-            <h3 class="text-2xl font-bold text-gray-800 mb-4 text-center">教師管理區</h3>
-            <p class="text-gray-600 mb-6 text-center">請輸入管理密碼</p>
-            <div class="mb-6">
-                <label for="passwordInput" class="block text-sm font-medium text-gray-700 mb-2">密碼</label>
-                <input type="password" id="passwordInput" class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:outline-none text-lg" placeholder="請輸入密碼">
-            </div>
-            <div class="flex gap-3">
-                <button onclick="cancelPassword()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl transition-all">
-                    取消
-                </button>
-                <button onclick="confirmPassword()" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl transition-all">
-                    確認
-                </button>
-            </div>
-        </div>
+   </header><!-- 首頁 -->
+   <div class="p-8 text-center" id="homePage">
+    <h2 class="text-3xl font-bold text-gray-800 mb-8">歡迎來到英文單字測驗</h2>
+    <div class="grid md:grid-cols-3 gap-6 mb-8">
+     <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl border-2 border-blue-200 hover:border-blue-400 transition-all hover:transform hover:scale-105">
+      <div class="text-3xl font-bold text-blue-600 mb-2">
+       1-5
+      </div>
+      <div class="text-xl font-semibold mb-2">
+       英文選中文
+      </div>
+      <div class="text-gray-600">
+       看英文單字，選擇正確的中文意思
+      </div>
+     </div>
+     <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-2xl border-2 border-green-200 hover:border-green-400 transition-all hover:transform hover:scale-105">
+      <div class="text-3xl font-bold text-green-600 mb-2">
+       6-10
+      </div>
+      <div class="text-xl font-semibold mb-2">
+       中文選英文
+      </div>
+      <div class="text-gray-600">
+       看中文意思，選擇正確的英文單字
+      </div>
+     </div>
+     <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl border-2 border-purple-200 hover:border-purple-400 transition-all hover:transform hover:scale-105">
+      <div class="text-3xl font-bold text-purple-600 mb-2">
+       11-15
+      </div>
+      <div class="text-xl font-semibold mb-2">
+       拖拉拼字
+      </div>
+      <div class="text-gray-600">
+       拖拉字母卡片拼出正確單字
+      </div>
+     </div>
+    </div><button onclick="startQuiz()" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-full text-xl transition-all transform hover:scale-105 shadow-lg"> 🚀 開始測驗 (15題) </button>
+    <div class="mt-6"><button onclick="showTeacherPanel()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full transition-all"> 👨‍🏫 教師管理區 </button>
     </div>
-
-    <script>
+   </div><!-- 教師管理區 -->
+   <div class="p-8 hidden" id="teacherPanel">
+    <h2 class="text-3xl font-bold text-gray-800 mb-6">教師管理區</h2>
+    <div class="bg-gray-50 rounded-2xl p-6 mb-6">
+     <h3 class="text-xl font-bold text-gray-700 mb-4">📚 單字庫</h3>
+     <div class="grid gap-3" id="vocabList"><!-- 單字列表會動態生成 -->
+     </div>
+    </div><button onclick="showHome()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-full transition-all"> 返回首頁 </button>
+   </div><!-- 測驗區域 -->
+   <div class="p-8 hidden" id="quizArea">
+    <div class="text-center mb-6">
+     <div class="text-lg text-gray-600 mb-2" id="questionCounter">
+      第 1 題 / 15 題
+     </div>
+     <div class="text-sm text-gray-500" id="stageInfo">
+      階段一：英文選中文
+     </div>
+    </div><!-- 題目顯示 -->
+    <div class="text-center mb-8">
+     <div class="flex items-center justify-center gap-4 mb-4">
+      <div class="text-5xl font-bold text-gray-800" id="questionWord">
+       beautiful
+      </div><button onclick="speakWord()" class="bg-blue-500 hover:bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110"> 🔊 </button>
+     </div>
+    </div><!-- 選擇題選項 -->
+    <div class="grid grid-cols-2 gap-4 max-w-2xl mx-auto mb-8" id="optionsContainer"><!-- 選項會動態生成 -->
+    </div><!-- 答題結果訊息 -->
+    <div class="text-center mb-6 hidden" id="feedbackMessage"><!-- 答題結果會動態顯示 -->
+    </div><!-- 拖拉拼字區域 -->
+    <div class="max-w-3xl mx-auto hidden" id="spellingContainer">
+     <div class="text-center mb-6">
+      <div class="text-lg font-bold text-gray-700 mb-2">
+       拖拉字母卡片來拼出單字：
+      </div>
+      <div class="text-sm text-blue-600 mb-2">
+       💡 提示：這個單字總共有 <span id="letterCount" class="font-bold">0</span> 個字母
+      </div>
+      <div class="text-sm text-green-600 font-bold">
+       目前已選：<span id="selectedCount" class="font-bold">0</span> 個字母
+      </div>
+     </div><!-- 答案區域 -->
+     <div id="answerArea" class="answer-area min-h-20 bg-gray-50 border-3 border-dashed border-gray-300 rounded-2xl p-6 mb-6 flex items-center justify-center gap-2 flex-wrap transition-all">
+      <div class="text-gray-400 text-lg">
+       將字母卡片拖拉到這裡
+      </div>
+     </div><!-- 字母卡片區域 -->
+     <div class="text-center mb-4">
+      <div class="text-sm text-gray-600 mb-3">
+       可用字母：
+      </div>
+      <div id="letterCards" class="flex flex-wrap gap-3 justify-center mb-6"><!-- 字母卡片會動態生成 -->
+      </div>
+     </div>
+     <div class="flex gap-4 justify-center"><button onclick="clearAnswer()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl transition-all"> 🗑️ 清除 </button> <button onclick="checkSpelling()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl transition-all" id="checkBtn"> ✅ 確認答案 </button>
+     </div>
+    </div><!-- 下一題按鈕 -->
+    <div class="text-center mt-8"><button onclick="nextQuestion()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-xl transition-all hidden" id="nextBtn"> ➡️ 下一題 </button>
+    </div>
+   </div><!-- 結果頁面 -->
+   <div class="p-8 text-center hidden" id="resultsPage">
+    <div class="mb-8">
+     <div class="text-6xl mb-4">
+      🎉
+     </div>
+     <h2 class="text-4xl font-bold text-gray-800 mb-4">測驗完成！</h2>
+     <div class="text-6xl font-bold text-green-600 mb-2" id="finalScore">
+      15/15
+     </div>
+     <div class="text-xl text-gray-600" id="scoreMessage">
+      恭喜！全部答對了！
+     </div>
+    </div>
+    <div class="bg-gray-50 rounded-2xl p-6 mb-8">
+     <h3 class="text-xl font-bold text-gray-700 mb-4">📊 詳細成績</h3>
+     <div class="grid grid-cols-3 gap-4" id="stageScores"><!-- 各階段成績會動態生成 -->
+     </div>
+    </div>
+    <div class="flex gap-4 justify-center"><button onclick="restartQuiz()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl transition-all"> 🔄 重新測驗 </button> <button onclick="showHome()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl transition-all"> 🏠 返回首頁 </button>
+    </div>
+   </div>
+  </div><!-- 鍵盤提示 -->
+  <div class="fixed bottom-4 right-4 bg-black/80 text-white px-4 py-2 rounded-full text-sm backdrop-blur-sm hidden" id="keyboardHint">
+   按空白鍵：下一題 ⌨️
+  </div><!-- 自定義密碼輸入框 -->
+  <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden" id="passwordModal">
+   <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+    <h3 class="text-2xl font-bold text-gray-800 mb-4 text-center">教師管理區</h3>
+    <p class="text-gray-600 mb-6 text-center">請輸入管理密碼</p>
+    <div class="mb-6"><label for="passwordInput" class="block text-sm font-medium text-gray-700 mb-2">密碼</label> <input type="password" id="passwordInput" class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:outline-none text-lg" placeholder="請輸入密碼">
+    </div>
+    <div class="flex gap-3"><button onclick="cancelPassword()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl transition-all"> 取消 </button> <button onclick="confirmPassword()" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl transition-all"> 確認 </button>
+    </div>
+   </div>
+  </div>
+  <script>
         // 單字庫
         const vocabulary = [
             { word: 'beautiful', meaning: '美麗的' },
             { word: 'because', meaning: '因為' },
             { word: 'become', meaning: '變成' },
             { word: 'bedroom', meaning: '臥室' },
-            { word: 'before', meaning: '在…之前' },
-            { word: 'believe', meaning: '相信' },
-            { word: 'between', meaning: '在...之間' },
-            { word: 'bicycle', meaning: '腳踏車' },
-            { word: 'brother', meaning: '兄弟' },
-            { word: 'building', meaning: '建築物' }
+            { word: 'before', meaning: '在…之前' }
         ];
 
         // 全域變數
@@ -898,5 +850,5 @@
         // 初始化
         showHome();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99500f21c1b9073c',t:'MTc2MTU0NTcyOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9966afa9c518843a',t:'MTc2MTc4Mjk5MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
