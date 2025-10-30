@@ -401,13 +401,15 @@
                 const speakBtn = button.querySelector('button');
                 speakBtn.onclick = (event) => {
                     event.stopPropagation();
-                    // 根據階段決定要發音的內容
+                    // 所有階段都只發音英文單字
                     if (question.stage === 1) {
                         // 階段一：英文選中文，發音英文單字
                         speakText(question.word);
                     } else if (question.stage === 2) {
-                        // 階段二：中文選英文，發音選項中的英文單字
-                        speakText(option);
+                        // 階段二：中文選英文，發音選項中的英文單字（只有當選項是英文時才發音）
+                        if (vocabulary.some(v => v.word === option)) {
+                            speakText(option);
+                        }
                     }
                 };
                 container.appendChild(button);
@@ -850,5 +852,5 @@
         // 初始化
         showHome();
     </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9966afa9c518843a',t:'MTc2MTc4Mjk5MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9966b3b215e6843a',t:'MTc2MTc4MzE1NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
